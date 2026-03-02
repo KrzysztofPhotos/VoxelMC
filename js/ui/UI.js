@@ -54,75 +54,75 @@ export class UI {
 
         this.shapeConfigs = {
             helix: { class: ProceduralHelix, params: [
-                { name: 'radius', label: 'Promień', value: 10 },
-                { name: 'height', label: 'Wysokość', value: 40 },
-                { name: 'turns', label: 'Ilość Obrotów', value: 3, step: 0.1 },
-                { name: 'thickness', label: 'Grubość Linii', value: 2 },
-                { name: 'tube', label: 'Tryb Rury', value: true, type: 'checkbox' },
-                { name: 'doubleHelix', label: 'Podwójna Helisa', value: true, type: 'checkbox' },
-                { name: 'connectorSpacing', label: 'Łączniki (0=Brak)', value: 1.5, step: 0.1 },
-                { name: 'coreRadius', label: 'Rdzeń (0=Brak)', value: 3 },
-                { name: 'ringSpacing', label: 'Pierścienie (0=Brak)', value: 10 },
-                { name: 'taper', label: 'Zwężanie (0-1)', value: 0.5, step: 0.1, min: 0 },
-                { name: 'topPlatform', label: 'Platforma Szczytowa', value: true, type: 'checkbox' }
+                { name: 'radius', label: 'Radius', value: 10 },
+                { name: 'height', label: 'Height', value: 40 },
+                { name: 'turns', label: 'Number of Turns', value: 3, step: 0.1 },
+                { name: 'thickness', label: 'Line Thickness', value: 2 },
+                { name: 'tube', label: 'Tube Mode', value: true, type: 'checkbox' },
+                { name: 'doubleHelix', label: 'Double Helix', value: true, type: 'checkbox' },
+                { name: 'connectorSpacing', label: 'Connectors (0=None)', value: 1.5, step: 0.1 },
+                { name: 'coreRadius', label: 'Core (0=None)', value: 3 },
+                { name: 'ringSpacing', label: 'Rings (0=None)', value: 10 },
+                { name: 'taper', label: 'Taper (0-1)', value: 0.5, step: 0.1, min: 0 },
+                { name: 'topPlatform', label: 'Top Platform', value: true, type: 'checkbox' }
             ]},
             paraboloid: { class: ProceduralParaboloid, params: [
-                { name: 'radius', label: 'Promień', value: 15 },
-                { name: 'height', label: 'Wysokość', value: 10 }
+                { name: 'radius', label: 'Radius', value: 15 },
+                { name: 'height', label: 'Height', value: 10 }
             ]},
             bridge: { class: ProceduralArchBridge, params: [
-                { name: 'span', label: 'Długość (Rozpiętość)', value: 60 },
-                { name: 'width', label: 'Szerokość', value: 7 },
-                { name: 'thickness', label: 'Grubość Łuku', value: 3 },
-                { name: 'segments', label: 'Ilość Segmentów', value: 3 },
-                { name: 'curveAmount', label: 'Skręt Mostu', value: 0.5, step: 0.1, min: 0 },
-                { name: 'hasGate', label: 'Dodaj Bramę', value: true, type: 'checkbox' }
+                { name: 'span', label: 'Length (Span)', value: 60 },
+                { name: 'width', label: 'Width', value: 7 },
+                { name: 'thickness', label: 'Arch Thickness', value: 3 },
+                { name: 'segments', label: 'Number of Segments', value: 3 },
+                { name: 'curveAmount', label: 'Bridge Curve', value: 0.5, step: 0.1, min: 0 },
+                { name: 'hasGate', label: 'Add Gate', value: true, type: 'checkbox' }
             ]},
             house: { class: ProceduralHouse, params: [
-                { name: 'width', label: 'Szerokość', value: 11 },
-                { name: 'depth', label: 'Głębokość', value: 11 },
-                { name: 'height', label: 'Wysokość Ścian', value: 5 },
-                { name: 'roofHeight', label: 'Wysokość Dachu', value: 5 }
+                { name: 'width', label: 'Width', value: 11 },
+                { name: 'depth', label: 'Depth', value: 11 },
+                { name: 'height', label: 'Wall Height', value: 5 },
+                { name: 'roofHeight', label: 'Roof Height', value: 5 }
             ]},
             medieval_house: { class: ProceduralMedievalHouse, params: [
-                { name: 'width', label: 'Szerokość', value: 11 },
-                { name: 'depth', label: 'Głębokość', value: 11 },
-                { name: 'wallHeight', label: 'Wysokość Ścian', value: 6 },
-                { name: 'roofHeight', label: 'Wysokość Dachu', value: 5 },
-                { name: 'overhang', label: 'Wysunięcie Dachu', value: 1 },
-                { name: 'timberFrame', label: 'Drewniany Szkielet', value: true, type: 'checkbox' },
-                { name: 'chimney', label: 'Komin', value: true, type: 'checkbox' },
-                { name: 'foundationHeight', label: 'Wysokość Fundamentu', value: 1 },
-                { name: 'windowCount', label: 'Liczba Okien', value: 4 }
+                { name: 'width', label: 'Width', value: 11 },
+                { name: 'depth', label: 'Depth', value: 11 },
+                { name: 'wallHeight', label: 'Wall Height', value: 6 },
+                { name: 'roofHeight', label: 'Roof Height', value: 5 },
+                { name: 'overhang', label: 'Roof Overhang', value: 1 },
+                { name: 'timberFrame', label: 'Timber Frame', value: true, type: 'checkbox' },
+                { name: 'chimney', label: 'Chimney', value: true, type: 'checkbox' },
+                { name: 'foundationHeight', label: 'Foundation Height', value: 1 },
+                { name: 'windowCount', label: 'Window Count', value: 4 }
             ]},
             tower: { class: ProceduralTower, params: [
-                { name: 'radius', label: 'Promień', value: 8 },
-                { name: 'height', label: 'Wysokość', value: 24 },
-                { name: 'wallThickness', label: 'Grubość Ściany', value: 1 },
-                { name: 'hasRoof', label: 'Dodaj dach', value: true, type: 'checkbox' }
+                { name: 'radius', label: 'Radius', value: 8 },
+                { name: 'height', label: 'Height', value: 24 },
+                { name: 'wallThickness', label: 'Wall Thickness', value: 1 },
+                { name: 'hasRoof', label: 'Add Roof', value: true, type: 'checkbox' }
             ]},
-            sphere: { class: Sphere, params: [{ name: 'radius', label: 'Promień', value: 10 }] },
-            circle: { class: Circle, params: [{ name: 'radius', label: 'Promień', value: 10 }] },
+            sphere: { class: Sphere, params: [{ name: 'radius', label: 'Radius', value: 10 }] },
+            circle: { class: Circle, params: [{ name: 'radius', label: 'Radius', value: 10 }] },
             ellipse: { class: Ellipse, params: [
-                { name: 'width', label: 'Szerokość', value: 20 },
-                { name: 'height', label: 'Wysokość', value: 10 }
+                { name: 'width', label: 'Width', value: 20 },
+                { name: 'height', label: 'Height', value: 10 }
             ]},
             ellipsoid: { class: Ellipsoid, params: [
-                { name: 'width', label: 'Szerokość', value: 20 },
-                { name: 'height', label: 'Wysokość', value: 10 },
-                { name: 'depth', label: 'Głębokość', value: 15 }
+                { name: 'width', label: 'Width', value: 20 },
+                { name: 'height', label: 'Height', value: 10 },
+                { name: 'depth', label: 'Depth', value: 15 }
             ]},
             cylinder: { class: Cylinder, params: [
-                { name: 'radius', label: 'Promień', value: 10 },
-                { name: 'height', label: 'Wysokość', value: 20 }
+                { name: 'radius', label: 'Radius', value: 10 },
+                { name: 'height', label: 'Height', value: 20 }
             ]},
             cone: { class: Cone, params: [
-                { name: 'radius', label: 'Promień', value: 10 },
-                { name: 'height', label: 'Wysokość', value: 20 }
+                { name: 'radius', label: 'Radius', value: 10 },
+                { name: 'height', label: 'Height', value: 20 }
             ]},
             torus: { class: Torus, params: [
-                { name: 'majorRadius', label: 'Promień główny', value: 15 },
-                { name: 'minorRadius', label: 'Promień rurki', value: 5 }
+                { name: 'majorRadius', label: 'Major Radius', value: 15 },
+                { name: 'minorRadius', label: 'Minor Radius', value: 5 }
             ]}
         };
 

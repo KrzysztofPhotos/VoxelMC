@@ -35,33 +35,33 @@ export class ProceduralHouse {
     generate() {
         this.blocks.clear();
 
-        // 7) Centrowanie i symetria - symetryczne współrzędne od -halfW do halfW
-        // Środek zawsze idealnie w (0,0)
+        // 7) Centering and symmetry - symmetric coordinates from -halfW to halfW
+        // Center always exactly at (0,0)
         const halfW = Math.floor(this.width / 2);
         const halfD = Math.floor(this.depth / 2);
         
-        // 1) Fundament
+        // 1) Foundation
         for (let x = -halfW; x <= halfW; x++) {
             for (let z = -halfD; z <= halfD; z++) {
                 this.addBlock(x, 0, z, this.materialFloor);
             }
         }
 
-        // 2) Ściany (hollow) - tylko zewnętrzne
+        // 2) Walls (hollow) - outer only
         for (let y = 1; y <= this.height; y++) {
-            // Przód i Tył
+            // Front and Back
             for (let x = -halfW; x <= halfW; x++) {
                 this.addBlock(x, y, -halfD, this.materialWall);
                 this.addBlock(x, y, halfD, this.materialWall);
             }
-            // Lewa i Prawa (bez rogów, brak duplikatów)
+            // Left and Right (no corners, no duplicates)
             for (let z = -halfD + 1; z <= halfD - 1; z++) {
                 this.addBlock(-halfW, y, z, this.materialWall);
                 this.addBlock(halfW, y, z, this.materialWall);
             }
         }
 
-        // 3) Proporcje i zabezpieczenia dachu
+        // 3) Roof proportions and safety
         let maxRoofHeight = Math.floor(this.width / 2);
         if (this.roofHeight > maxRoofHeight) {
             this.roofHeight = maxRoofHeight;
@@ -74,8 +74,8 @@ export class ProceduralHouse {
         }
         if (this.roofHeight < 1) this.roofHeight = 1;
 
-        // 3) Dach dwuspadowy
-        // Okap zaczyna się o 1 blok poza ścianami
+        // 3) Gabled roof
+        // Overhang starts 1 block outside the walls
         let prevLeft = -halfW - 2;
         let prevRight = halfW + 2;
 
@@ -83,13 +83,13 @@ export class ProceduralHouse {
             let y = this.height + ry;
             let progress = ry / this.roofHeight;
             
-            // Gwarancja braku pionowych ścian i płaskich bloków
-            // Liniowa interpolacja zapewnia idealne zejście się dachu w punkcie x=0 (kalenica)
+            // Guarantee no vertical walls and flat blocks
+            // Linear interpolation ensures roof meets perfectly at x=0 (ridge)
             let currentLeft = Math.round((-halfW - 1) * (1 - progress));
             let currentRight = Math.round((halfW + 1) * (1 - progress));
             
             for (let z = -halfD; z <= halfD; z++) {
-                // Wypełniamy ewentualne "luki" w spadku dachu rysując ciągłe segmenty (rasteryzacja spadku)
+                // Fill any "gaps" in roof slope by drawing continuous segments (slope rasterization)
                 for (let x = prevLeft + 1; x <= currentLeft; x++) {
                     this.addBlock(x, y, z, this.materialRoof);
                 }
@@ -102,21 +102,21 @@ export class ProceduralHouse {
             prevRight = currentRight;
         }
 
-        // 4) Drzwi
-        // Na samym środku (x=0), wycinamy z wygenerowanej już przedniej ściany
-        if (halfW >= 1) { // Nie usuwamy, jeśli to skrajny róg (szerokość bryły to min. 3)
+        // 4) Door
+        // Exactly in the middle (x=0), cut from existing front wall
+        if (halfW >= 1) { // Don't remove if it's extreme corner (min body width is 3)
             this.removeBlock(0, 1, -halfD);
             if (this.height >= 2) {
                 this.removeBlock(0, 2, -halfD);
             }
         }
 
-        // 5) Okna
-        // Rozmiar 1x1, na wysokości połowy ściany
+        // 5) Windows
+        // Size 1x1, at half wall height
         if (halfD >= 1 && this.height >= 2) {
             let winY = Math.max(1, Math.floor(this.height / 2));
-            this.removeBlock(-halfW, winY, 0); // Lewe okno
-            this.removeBlock(halfW, winY, 0);  // Prawe okno
+            this.removeBlock(-halfW, winY, 0); // Left window
+            this.removeBlock(halfW, winY, 0);  // Right window
         }
 
         return Array.from(this.blocks.values());

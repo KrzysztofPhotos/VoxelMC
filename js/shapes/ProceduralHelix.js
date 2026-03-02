@@ -1,6 +1,6 @@
 export class ProceduralHelix {
     constructor(params) {
-        // Podstawowe
+        // Basic
         this.radius = params.radius || 10;
         this.height = params.height || 20;
         this.turns = params.turns || 3;
@@ -8,9 +8,9 @@ export class ProceduralHelix {
         this.tube = params.tube !== undefined ? params.tube : true;
         this.hollow = params.hollow !== undefined ? params.hollow : true;
         
-        // Zaawansowane (ArchitecturalHelix)
+        // Advanced (ArchitecturalHelix)
         this.doubleHelix = params.doubleHelix !== undefined ? params.doubleHelix : false;
-        this.connectorSpacing = params.connectorSpacing || 0; // Wartość z UI np w wielokrotnościach PI (lub stały odstęp). Użyjemy t co np. PI/4 jeśli > 0.
+        this.connectorSpacing = params.connectorSpacing || 0; // UI value e.g. in PI multiples (or constant interval). We use t e.g. every PI/4 if > 0.
         this.connectorThickness = params.connectorThickness || 1;
         
         this.coreRadius = params.coreRadius || 0;
@@ -18,13 +18,13 @@ export class ProceduralHelix {
         this.ringSpacing = params.ringSpacing || 0;
         this.ringThickness = params.ringThickness || 1;
         
-        this.taper = params.taper || 0; // 0 do 1
+        this.taper = params.taper || 0; // 0 to 1
         
         this.topPlatform = params.topPlatform !== undefined ? params.topPlatform : false;
         this.platformRadius = params.platformRadius || 15;
         this.platformThickness = params.platformThickness || 1;
         
-        // Materiały
+        // Materials
         this.materialWall = params.materialWall || 'wall';
         this.materialConnector = params.materialConnector || 'detail';
         this.materialCore = params.materialCore || 'core';
@@ -41,7 +41,7 @@ export class ProceduralHelix {
         this.blocks.set(key, { x: ix, y: iy, z: iz, type });
     }
 
-    // Algorytm Bresenhama w 3D do rysowania linii łączników
+    // 3D Bresenham's algorithm for drawing connector lines
     drawLine3D(x0, y0, z0, x1, y1, z1, thickness, material) {
         const dx = Math.abs(x1 - x0);
         const dy = Math.abs(y1 - y0);
@@ -123,13 +123,13 @@ export class ProceduralHelix {
         const pitch = h / maxT;
         const startY = -(h / 2);
         
-        // Zoptymalizowany taper z przedziału 0.0 - 1.0
+        // Optimized taper from interval 0.0 - 1.0
         const getRadius = (yCoord) => {
             const normalizedY = (yCoord - startY) / h;
             return Math.max(0, this.radius * (1 - this.taper * normalizedY));
         };
         
-        // 3. RDZEŃ CENTRALNY (CYLINDER)
+        // 3. CENTRAL CORE (CYLINDER)
         if (this.coreRadius > 0) {
             const cRadius = Math.round(this.coreRadius);
             for (let y = 0; y <= h; y++) {
@@ -147,7 +147,7 @@ export class ProceduralHelix {
             }
         }
 
-        // Krok dla parametru t
+        // Step for parameter t
         const maxBaseRadius = this.radius;
         const ds = Math.sqrt(maxBaseRadius * maxBaseRadius + pitch * pitch);
         const dt = ds > 0 ? 0.25 / ds : 0.1;
@@ -162,7 +162,7 @@ export class ProceduralHelix {
                 const cx = currentR * Math.cos(t + offsetPhase);
                 const cz = currentR * Math.sin(t + offsetPhase);
 
-                // Rysowanie zwoju helisy (tube lub box/sphere)
+                // Drawing helix turn (tube or box/sphere)
                 if (!this.tube) {
                     for (let dx = -thick; dx <= thick; dx++) {
                         for (let dy = -thick; dy <= thick; dy++) {
@@ -174,9 +174,9 @@ export class ProceduralHelix {
                         }
                     }
                 } else {
-                    // TRYB RURY Z Frenet-Serret frames 
-                    // Biorąc pod uwagę taper, wektor styczny delikatnie ulega zniekształceniu, 
-                    // dla gładkości rury zignorujemy mikrozmianę promienia w pochodnej.
+                    // TUBE MODE with Frenet-Serret frames 
+                    // Considering taper, tangent vector is slightly distorted,
+                    // for tube smoothness we ignore micro-change of radius in derivative.
                     const tx = -currentR * Math.sin(t + offsetPhase);
                     const ty = pitch;
                     const tz = currentR * Math.cos(t + offsetPhase);
@@ -216,7 +216,7 @@ export class ProceduralHelix {
                     }
                 }
                 
-                // 2. ŁĄCZNIKI (tylko w pierwszej fali wywołujemy, bo łączą się z drugą)
+                // 2. CONNECTORS (only in first wave as they connect with second)
                 if (this.doubleHelix && offsetPhase === 0 && this.connectorSpacing > 0) {
                     if (t - lastConnectorT >= this.connectorSpacing) {
                         lastConnectorT = t;
@@ -234,15 +234,15 @@ export class ProceduralHelix {
             }
         };
 
-        // Główna helisa
+        // Main helix
         renderHelixStrand(0);
 
-        // 1. PODWÓJNA HELISA (Przesunięta o PI)
+        // 1. DOUBLE HELIX (Offset by PI)
         if (this.doubleHelix) {
             renderHelixStrand(Math.PI);
         }
 
-        // 4. PIERŚCIENIE STRUKTURALNE
+        // 4. STRUCTURAL RINGS
         if (this.ringSpacing > 0) {
             const rt = Math.round(this.ringThickness);
             
@@ -251,7 +251,7 @@ export class ProceduralHelix {
                 const currentRingR = Math.round(getRadius(py));
                 
                 if (currentRingR > 0) {
-                    // Generuj poziomy pierścień (koło)
+                    // Generate horizontal ring (circle)
                     for (let x = -currentRingR - rt; x <= currentRingR + rt; x++) {
                         for (let z = -currentRingR - rt; z <= currentRingR + rt; z++) {
                             const distSq = x * x + z * z;
@@ -266,7 +266,7 @@ export class ProceduralHelix {
             }
         }
 
-        // 6. PLATFORMY (TOP)
+        // 6. PLATFORMS (TOP)
         if (this.topPlatform) {
             const pRadius = Math.round(this.platformRadius);
             const pThickness = Math.round(this.platformThickness);
@@ -283,7 +283,7 @@ export class ProceduralHelix {
                 }
             }
             
-            // Subtelny gzyms platformy
+            // Subtle platform cornice
             const pyBase = topY;
             for (let x = -pRadius - 1; x <= pRadius + 1; x++) {
                 for (let z = -pRadius - 1; z <= pRadius + 1; z++) {

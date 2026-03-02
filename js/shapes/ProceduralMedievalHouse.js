@@ -44,7 +44,7 @@ export class ProceduralMedievalHouse {
         const chimneyMat = 'bricks';
         const glassMat = 'glass';
 
-        // 1. FUNDAMENT
+        // 1. FOUNDATION
         const fHeight = Math.max(1, this.foundationHeight);
         for (let y = 0; y < fHeight; y++) {
             for (let x = -halfW - 1; x <= halfW + 1; x++) {
@@ -54,7 +54,7 @@ export class ProceduralMedievalHouse {
             }
         }
 
-        // 2. ŚCIANY
+        // 2. WALLS
         const startY = fHeight;
         const bHeight = Math.max(1, Math.floor(this.wallHeight / 2));
 
@@ -91,7 +91,7 @@ export class ProceduralMedievalHouse {
             }
         }
 
-        // 7. BELKI DEKORACYJNE (Wystające narożniki)
+        // DECORATIVE BEAMS (Protruding corners)
         if (this.timberFrame) {
             for (let y = startY; y < startY + this.wallHeight; y++) {
                 this.addBlock(-halfW - 1, y, -halfD - 1, frameMat);
@@ -101,7 +101,7 @@ export class ProceduralMedievalHouse {
             }
         }
 
-        // 3. DACH (Dwuspadowy)
+        // 3. ROOF (Gabled)
         const roofStartY = startY + this.wallHeight;
         const oH = Math.max(0, this.overhang);
 
@@ -122,7 +122,7 @@ export class ProceduralMedievalHouse {
             }
         }
         
-        // Wypełnienie trójkątów ściany (szczyty)
+        // Wall triangles (Gables)
         for (let ry = 0; ry < this.roofHeight; ry++) {
             let fillW = halfW - 1 - ry;
             if (fillW < 0) break;
@@ -133,13 +133,13 @@ export class ProceduralMedievalHouse {
             }
         }
         
-        // Kalenica
+        // Ridge beam
         const ridgeY = roofStartY + this.roofHeight;
         for (let z = -halfD - oH; z <= halfD + oH; z++) {
             this.addBlock(0, ridgeY + 1, z, roofRidgeMat);
         }
 
-        // 4. KOMIN
+        // 4. CHIMNEY
         if (this.chimney && halfW >= 2 && halfD >= 2) {
             let cx = halfW - 1;
             let cz = halfD - 1;
@@ -151,7 +151,7 @@ export class ProceduralMedievalHouse {
             }
         }
 
-        // 6. DRZWI
+        // 6. DOOR
         if (halfW >= 1) {
             const doorZ = -halfD;
             this.removeBlock(0, startY, doorZ);
@@ -162,12 +162,12 @@ export class ProceduralMedievalHouse {
             this.addBlock(0, startY + 2, doorZ - 1, frameMat);
         }
 
-        // 5. OKNA (zależne od windowCount)
+        // 5. WINDOWS
         if (this.wallHeight >= 3) {
             const winY = startY + bHeight;
             let currentWindows = 0;
 
-            // Spróbuj dodać okna na ścianach bocznych
+            // Side walls
             if (halfD >= 3 && currentWindows < this.windowCount) {
                 this.addBlock(-halfW, winY, 0, glassMat);
                 this.addBlock(-halfW, winY + 1, 0, glassMat);
@@ -181,7 +181,7 @@ export class ProceduralMedievalHouse {
                 currentWindows++;
             }
             
-            // Okna na froncie/tyle
+            // Front/Back
             if (halfW >= 3 && currentWindows < this.windowCount) {
                 this.addBlock(-halfW + 2, winY, -halfD, glassMat);
                 this.addBlock(-halfW + 2, winY + 1, -halfD, glassMat);

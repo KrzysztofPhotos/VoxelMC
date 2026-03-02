@@ -1,12 +1,12 @@
 export class ProceduralArchBridge {
     constructor(params) {
-        this.span = params.span || 60; // Zwiększony span, bo wiele łuków
+        this.span = params.span || 60; // Increased span for multiple arches
         this.width = params.width || 7;
         this.thickness = params.thickness || 3;
         
-        // Nowe parametry dla wersji segmentowanej
+        // New parameters for segmented version
         this.segments = params.segments || 3;
-        this.curveAmount = params.curveAmount || 0.5; // od 0 do 0.7
+        this.curveAmount = params.curveAmount || 0.5; // 0 to 0.7
         this.hasGate = params.hasGate !== undefined ? params.hasGate : 1;
         
         this.materialMain = params.materialMain || 'stone_bricks';
@@ -68,7 +68,7 @@ export class ProceduralArchBridge {
     generate() {
         this.blocks.clear();
 
-        // 5) PROPORCJE I PARAMETRY
+        // 5) PROPORTIONS AND PARAMETERS
         let s = Math.round(this.span);
         if (s % 2 !== 0) s += 1;
         
@@ -84,7 +84,7 @@ export class ProceduralArchBridge {
         
         const segmentLength = s / segs;
         const ah = Math.max(3, Math.round(segmentLength / 4));
-        const ph = Math.max(0, Math.round(s / 6)); // Baza filarów
+        const ph = Math.max(0, Math.round(s / 6)); // Pillar base
         let thick = Math.max(2, Math.round(this.thickness));
 
         const platformBaseY = ph + ah; 
@@ -95,33 +95,33 @@ export class ProceduralArchBridge {
             this.addBlock(x, y, z, finalType);
         };
 
-        // 2) DELIKATNY SKRĘT (Krzywizna w osi Z)
+        // 2) GENTLE CURVE (Z-axis curvature)
         const getCurveZ = (x) => {
-            // progress znormalizowany od 0 do 1
+            // normalized progress from 0 to 1
             const progress = (x + halfS) / s;
             return Math.sin(progress * Math.PI) * curve * maxCurveZ;
         };
 
-        // Funkcja obliczająca Y łuku w ramach danego segmentu
+        // Function calculating arch Y within a given segment
         const getSegmentArchY = (x) => {
-            // Znajdź w którym jesteśmy segmencie (indeks od 0 do segs-1)
+            // Find which segment we are in (index from 0 to segs-1)
             let segIndex = Math.floor((x + halfS) / segmentLength);
-            // Zabezpieczenie przed wyjściem za indeks przy x = halfS
+            // Protection against index overflow at x = halfS
             if (segIndex >= segs) segIndex = segs - 1;
             
-            // Środek tego segmentu
+            // Middle of this segment
             const segMidX = -halfS + (segIndex + 0.5) * segmentLength;
-            // Lokalny X względem środka segmentu
+            // Local X relative to segment middle
             const localX = x - segMidX;
             const halfSegL = segmentLength / 2;
             
-            // Parabola dla tego segmentu: y = a(x^2) + archHeight
+            // Parabola for this segment: y = a(x^2) + archHeight
             const a = -ah / (halfSegL * halfSegL);
             return a * (localX * localX) + ah;
         };
 
         // =====================================
-        // 1) GŁÓWNE ŁUKI NOŚNE I WTÓRNE OTWORY (Wielosegmentowe)
+        // 1) MAIN SUPPORT ARCHES AND SECONDARY HOLES (Multi-segmented)
         // =====================================
         for (let x = -halfS; x <= halfS; x++) {
             const parabolaY = getSegmentArchY(x);
@@ -133,17 +133,17 @@ export class ProceduralArchBridge {
             const maxConnectY = Math.max(topArchY, prevArchY);
             const minConnectY = Math.min(topArchY, prevArchY);
             
-            // Przesunięcie Z
+            // Z Offset
             const curveOffsetZ = Math.round(getCurveZ(x));
             
-            // Górna część węższa o 1 blok dla lżejszych proporcji
+            // Upper part narrower by 1 block for lighter proportions
             const currentHalfW = Math.max(2, halfW - (parabolaY > ah * 0.8 ? 1 : 0));
 
             for (let localZ = -currentHalfW - 1; localZ <= currentHalfW + 1; localZ++) {
                 const isEdge = (localZ === -currentHalfW - 1 || localZ === currentHalfW + 1);
                 const absoluteZ = localZ + curveOffsetZ;
                 
-                // Dwuwarstwowy rzymski styl
+                // Two-layer Roman style
                 if (isEdge) {
                     for (let y = minConnectY - thick - 1; y <= maxConnectY; y++) {
                         if (y >= ph - 2) {
@@ -159,8 +159,8 @@ export class ProceduralArchBridge {
                 }
             }
             
-            // --- Otwory odciążające i Platforma wzdłuż łuku ---
-            // Łuki odciążające można wstawić w najszerszych częściach segmentu (przy filarach)
+            // --- Relief holes and Platform along the arch ---
+            // Relief arches can be inserted in the widest parts of the segment (at pillars)
             let isHole = false;
             let segIndex = Math.floor((x + halfS) / segmentLength);
             if (segIndex >= segs) segIndex = segs - 1;
@@ -168,7 +168,7 @@ export class ProceduralArchBridge {
             const localX = x - segMidX;
             const halfSegL = segmentLength / 2;
             
-            // Małe otwory odciążające na 2/3 długości połówki segmentu
+            // Small relief holes at 2/3 of segment half-length
             const secArchCenterLocal = halfSegL * 0.75;
             const secArchRadius = Math.floor(halfSegL * 0.15); 
             
@@ -189,7 +189,7 @@ export class ProceduralArchBridge {
             const hump = Math.round(Math.cos(((x + halfS)/s - 0.5) * Math.PI) * 1.0);
             const ySurface = platformBaseY + hump;
 
-            // Wypełnienie między łukiem a platformą
+            // Fill between arch and platform
             for (let y = archBaseY + 1; y <= ySurface - 1; y++) {
                 if (isHole && y < ySurface - 2) continue;
                 for (let localZ = -halfW; localZ <= halfW; localZ++) {
@@ -197,34 +197,34 @@ export class ProceduralArchBridge {
                 }
             }
 
-            // Platforma (Podłoga krzywa)
+            // Platform (Curved floor)
             for (let localZ = -halfW; localZ <= halfW; localZ++) {
                 addB(x, ySurface, localZ + curveOffsetZ, this.materialMain);
             }
             
-            // Gzyms
+            // Cornice
             addB(x, ySurface, -halfW - 1 + curveOffsetZ, this.materialDetail);
             addB(x, ySurface, halfW + 1 + curveOffsetZ, this.materialDetail);
 
-            // BARIERKI po krzywej
+            // RAILINGS along the curve
             const wallY = ySurface + 1;
             for (let side of [-1, 1]) {
                 const zEdge = side * halfW + curveOffsetZ;
                 
-                // Mur obronny wysokości 3 bloki
+                // Defensive wall 3 blocks high
                 for (let wy = 0; wy < 3; wy++) {
                     addB(x, wallY + wy, zEdge, this.materialMain);
                 }
                 
-                // Wąska strzelnica co 6 bloków
+                // Narrow arrow slit every 6 blocks
                 if (Math.abs(x) % 6 === 3) {
                     this.removeBlock(x, wallY + 1, zEdge);
                     this.removeBlock(x, wallY + 2, zEdge);
                 }
                 
-                // Mały wystający słupek co 10 bloków
+                // Small protruding pillar every 10 blocks
                 if (Math.abs(x) % 10 === 0) {
-                    const pillarZ = zEdge + side; // Wypuszczenie na zewnątrz
+                    const pillarZ = zEdge + side; // External projection
                     for (let wy = -1; wy <= 3; wy++) {
                         addB(x, wallY + wy, pillarZ, this.materialDetail);
                     }
@@ -233,7 +233,7 @@ export class ProceduralArchBridge {
                 }
             }
             
-            // Fix usunięcia strzelnicy w słupku jeśli wystąpiło zderzenie
+            // Fix arrow slit removal in pillar if collision occurred
             if (Math.abs(x) % 6 === 3) {
                 this.blocks.delete(`${Math.round(x)},${Math.round(wallY + 1)},${Math.round(-halfW + curveOffsetZ)}`);
                 this.blocks.delete(`${Math.round(x)},${Math.round(wallY + 1)},${Math.round(halfW + curveOffsetZ)}`);
@@ -241,12 +241,12 @@ export class ProceduralArchBridge {
         }
 
         // =====================================
-        // 3) FILARY POD SEGMENTAMI
+        // 3) PILLARS UNDER SEGMENTS
         // =====================================
-        // Każdy segment ma filar na krańcach: i=0...segs
+        // Each segment has a pillar at its ends: i=0...segs
         for (let i = 0; i <= segs; i++) {
             const px = -halfS + i * segmentLength;
-            // Pomijamy krawędzie skrajne (tam są schody)
+            // Skip edge boundaries (stairs are there)
             if (i === 0 || i === segs) continue;
             
             const pxR = Math.round(px);
@@ -255,9 +255,9 @@ export class ProceduralArchBridge {
             const pWidth = halfW;
 
             for (let y = -2; y <= archYAtPillar; y++) {
-                // Profil zwężający się ku górze
+                // Upward tapering profile
                 let expandBase = 0;
-                if (y < ph * 0.1) expandBase = 2; // Bardzo gruby na dnie
+                if (y < ph * 0.1) expandBase = 2; // Very thick at bottom
                 else if (y < ph * 0.4) expandBase = 1;
 
                 for (let x = pxR - 2 - expandBase; x <= pxR + 2 + expandBase; x++) {
@@ -266,7 +266,7 @@ export class ProceduralArchBridge {
                     }
                 }
 
-                // Water breakers (ostre kliny pod wodą) i przypory - szpiczaste na brzegach osi Z
+                // Water breakers (sharp wedges underwater) and buttresses - pointed at Z axis edges
                 if (y < ph * 0.5) {
                     const wedgeLen = Math.max(0, Math.floor(5 - (y / (ph * 0.5)) * 5));
                     if (wedgeLen > 0) {
@@ -283,7 +283,7 @@ export class ProceduralArchBridge {
         }
 
         // =====================================
-        // 6) LŻEJSZA KONSTRUKCJA SCHODÓW
+        // 6) LIGHTER STAIRS CONSTRUCTION
         // =====================================
         const endPlatformY = platformBaseY + Math.round(Math.cos(0.5 * Math.PI) * 1.0);
         
@@ -297,7 +297,7 @@ export class ProceduralArchBridge {
             const curveOffsetLeft = Math.round(getCurveZ(leftX));
             const curveOffsetRight = Math.round(getCurveZ(rightX));
 
-            // Zamiast do Y=0, pod każdym stopniem schodzimy tylko o 2 bloki by zrobić lekką strukturę pod schodami
+            // Under each step, only descend 2 blocks to create a lightweight structure
             for (let localZ = -halfW; localZ <= halfW; localZ++) {
                 for (let y = stepY - 2; y <= stepY; y++) {
                     addB(leftX, y, localZ + curveOffsetLeft, this.materialMain);
@@ -305,7 +305,7 @@ export class ProceduralArchBridge {
                 }
             }
             
-            // Boczne ściany osłaniające - grubości 1 bloku do samego dołu
+            // Side shielding walls - 1 block thick to the bottom
             for (let y = -2; y <= stepY + 3; y++) {
                 addB(leftX, y, -halfW - 1 + curveOffsetLeft, this.materialMain);
                 addB(leftX, y, halfW + 1 + curveOffsetLeft, this.materialMain);
@@ -313,7 +313,7 @@ export class ProceduralArchBridge {
                 addB(rightX, y, halfW + 1 + curveOffsetRight, this.materialMain);
             }
             
-            // Gzyms bocznych ścian
+            // Side wall cornice
             addB(leftX, stepY + 4, -halfW - 1 + curveOffsetLeft, this.materialDetail);
             addB(leftX, stepY + 4, halfW + 1 + curveOffsetLeft, this.materialDetail);
             addB(rightX, stepY + 4, -halfW - 1 + curveOffsetRight, this.materialDetail);
@@ -321,7 +321,7 @@ export class ProceduralArchBridge {
         }
 
         // =====================================
-        // 7) CENTRALNA WIEŻA BRAMNA W KRZYWIZNIE
+        // 7) CENTRAL GATE TOWER IN CURVATURE
         // =====================================
         if (this.hasGate) {
             const gateW = halfW; 
@@ -329,11 +329,11 @@ export class ProceduralArchBridge {
             const gateH = 6; 
             const ySurfaceCenter = platformBaseY + Math.round(Math.cos(0) * 1.0) + 1;
             
-            // Wieża stoi na środku x=0. Obliczamy offset dla środka.
+            // Tower stands at x=0. Calculate center offset.
             const centerCurveOffsetZ = Math.round(getCurveZ(0));
             
             for (let x = -gateD; x <= gateD; x++) {
-                // Delikatne zagięcie bramy by dopasowała się do platformy na tym ułamku X
+                // Gentle gate bend to match platform at this X fraction
                 const localCurveZ = Math.round(getCurveZ(x));
                 
                 for (let localZ = -gateW - 1; localZ <= gateW + 1; localZ++) {
@@ -352,7 +352,7 @@ export class ProceduralArchBridge {
                 }
             }
             
-            // Zwieńczenie Bramy z uwzględnieniem ścisłego środka
+            // Gate crowning with respect to exact middle
             const topY = ySurfaceCenter + gateH;
             for (let x = -gateD - 1; x <= gateD + 1; x++) {
                 const localCurveZ = Math.round(getCurveZ(x));
@@ -370,7 +370,7 @@ export class ProceduralArchBridge {
                 }
             }
         } else {
-            // Latarnie
+            // Lanterns
             const placeLantern = (lx, ly, lz) => {
                 addB(lx, ly, lz, this.materialDetail); 
                 addB(lx, ly + 1, lz, this.materialDetail); 

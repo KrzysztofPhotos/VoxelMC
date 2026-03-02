@@ -1,35 +1,47 @@
 export function exportJSON(blocks) {
-    const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(blocks));
-    downloadFile(dataStr, "voxel_shape.json");
+    if (blocks.length === 0) {
+        alert("No blocks to export");
+        return;
+    }
+    const dataStr = JSON.stringify(blocks, null, 2);
+    const dataUri = 'data:application/json;charset=utf-8,' + encodeURIComponent(dataStr);
+    const exportFileDefaultName = 'voxels.json';
+
+    const linkElement = document.createElement('a');
+    linkElement.setAttribute('href', dataUri);
+    linkElement.setAttribute('download', exportFileDefaultName);
+    linkElement.click();
 }
 
 export function exportCSV(blocks) {
-    if (blocks.length === 0) return;
-    const header = "x,y,z\\n";
-    const csv = blocks.map(b => `${b.x},${b.y},${b.z}`).join("\\n");
-    const dataStr = "data:text/csv;charset=utf-8," + encodeURIComponent(header + csv);
-    downloadFile(dataStr, "voxel_shape.csv");
-}
-
-export function copyToClipboard(blocks) {
     if (blocks.length === 0) {
-        alert("Brak bloków do skopiowania");
+        alert("No blocks to export");
         return;
     }
-    const txt = blocks.map(b => `[${b.x}, ${b.y}, ${b.z}]`).join(",\\n");
-    navigator.clipboard.writeText(`[\\n${txt}\\n]`).then(() => {
-        alert("Skopiowano do schowka!");
-    }).catch(err => {
-        console.error("Błąd kopiowania:", err);
-        alert("Nie udało się skopiować");
+    let csvContent = "data:text/csv;charset=utf-8,x,y,z,type\n";
+    blocks.forEach(b => {
+        csvContent += `${b.x},${b.y},${b.z},${b.type}\n`;
     });
+
+    const encodedUri = encodeURI(csvContent);
+    const link = document.createElement("a");
+    link.setAttribute("href", encodedUri);
+    link.setAttribute("download", "voxels.csv");
+    document.body.appendChild(link);
+    link.click();
 }
 
-function downloadFile(dataUrl, filename) {
-    const downloadAnchorNode = document.createElement('a');
-    downloadAnchorNode.setAttribute("href", dataUrl);
-    downloadAnchorNode.setAttribute("download", filename);
-    document.body.appendChild(downloadAnchorNode);
-    downloadAnchorNode.click();
-    downloadAnchorNode.remove();
+export async function copyToClipboard(blocks) {
+    if (blocks.length === 0) {
+        alert("No blocks to copy");
+        return;
+    }
+    const text = blocks.map(b => `${b.x},${b.y},${b.z},${b.type}`).join('\n');
+    try {
+        await navigator.clipboard.writeText(text);
+        alert("Copied to clipboard!");
+    } catch (err) {
+        console.error("Copy error:", err);
+        alert("Failed to copy");
+    }
 }

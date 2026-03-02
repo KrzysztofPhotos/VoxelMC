@@ -1,38 +1,39 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
+<svg width="64" height="64" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
   <defs>
-    <!-- Gradient dla górnej ściany (jasny niebieski) -->
-    <linearGradient id="top" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" stop-color="#4db8ff"/>
-      <stop offset="100%" stop-color="#007acc"/>
+    <!-- Gradient for top wall (light blue) -->
+    <linearGradient id="top-grad" x1="32" y1="8" x2="32" y2="32" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#4A90E2"/>
+      <stop offset="1" stop-color="#357ABD"/>
     </linearGradient>
     
-    <!-- Gradient dla lewej ściany (najciemniejszy, cień) -->
-    <linearGradient id="left" x1="0%" y1="0%" x2="0%" y2="100%">
-      <stop offset="0%" stop-color="#005f9e"/>
-      <stop offset="100%" stop-color="#002b4d"/>
+    <!-- Gradient for left wall (darkest, shadow) -->
+    <linearGradient id="left-grad" x1="10" y1="20" x2="32" y2="52" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#1B3A57"/>
+      <stop offset="1" stop-color="#12283C"/>
     </linearGradient>
     
-    <!-- Gradient dla prawej ściany (półcień) -->
-    <linearGradient id="right" x1="0%" y1="0%" x2="0%" y2="100%">
-      <stop offset="0%" stop-color="#007acc"/>
-      <stop offset="100%" stop-color="#004c8c"/>
+    <!-- Gradient for right wall (half-shadow) -->
+    <linearGradient id="right-grad" x1="54" y1="20" x2="32" y2="52" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#2A5C8D"/>
+      <stop offset="1" stop-color="#1B3A57"/>
     </linearGradient>
   </defs>
 
-  <!-- Górna ściana -->
-  <polygon points="50,8 92,30 50,53 8,30" fill="url(#top)"/>
+  <!-- Top wall -->
+  <path d="M32 8L54 20L32 32L10 20L32 8Z" fill="url(#top-grad)"/>
   
-  <!-- Lewa ściana -->
-  <polygon points="8,30 50,53 50,95 8,72" fill="url(#left)"/>
+  <!-- Left wall -->
+  <path d="M10 20V44L32 56V32L10 20Z" fill="url(#left-grad)"/>
   
-  <!-- Prawa ściana -->
-  <polygon points="50,53 92,30 92,72 50,95" fill="url(#right)"/>
-  
-  <!-- Wewnętrzne, "techniczne" linie na krawędziach dodające głębi -->
-  <polyline points="50,53 50,95" stroke="#ffffff" stroke-width="2" opacity="0.4" fill="none" stroke-linecap="round"/>
-  <polyline points="8,30 50,53" stroke="#ffffff" stroke-width="2" opacity="0.6" fill="none" stroke-linecap="round"/>
-  <polyline points="92,30 50,53" stroke="#ffffff" stroke-width="2" opacity="0.2" fill="none" stroke-linecap="round"/>
-  
-  <!-- Zewnętrzny, bardzo cienki obrys (glow) -->
-  <polygon points="50,8 92,30 92,72 50,95 8,72 8,30" stroke="#00aaff" stroke-width="1.5" opacity="0.8" fill="none" stroke-linejoin="round"/>
+  <!-- Right wall -->
+  <path d="M54 20V44L32 56V32L54 20Z" fill="url(#right-grad)"/>
+
+  <!-- Internal "technical" lines on edges adding depth -->
+  <path d="M32 32V56" stroke="white" stroke-opacity="0.1" stroke-width="1"/>
+  <path d="M10 20L32 32L54 20" stroke="white" stroke-opacity="0.1" stroke-width="1"/>
+  <path d="M32 8L10 20" stroke="white" stroke-opacity="0.2" stroke-width="1"/>
+  <path d="M32 8L54 20" stroke="white" stroke-opacity="0.2" stroke-width="1"/>
+
+  <!-- External thin outline (glow) -->
+  <path d="M32 8L54 20V44L32 56L10 44V20L32 8Z" stroke="#4A90E2" stroke-opacity="0.3" stroke-width="0.5"/>
 </svg>

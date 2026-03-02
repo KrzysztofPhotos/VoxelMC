@@ -35,13 +35,13 @@ export class ProceduralParaboloid {
             return Array.from(this.blocks.values());
         }
 
-        // 2) Wyznacz współczynnik a
+        // 2) Calculate coefficient a
         // y = a * (x^2 + z^2)
-        // dla x^2 + z^2 = r^2 -> y = h
+        // for x^2 + z^2 = r^2 -> y = h
         // a = h / r^2
         const a = h / (r * r);
 
-        // 3) Dla każdego x i z w zakresie [-radius, radius]
+        // 3) For each x and z in range [-radius, radius]
         for (let x = -r; x <= r; x++) {
             for (let z = -r; z <= r; z++) {
                 const rSq = x * x + z * z;
@@ -50,20 +50,20 @@ export class ProceduralParaboloid {
                     const exactY = a * rSq;
                     const topY = Math.round(exactY);
                     
-                    // Bez przerw w pionie - potrzebujemy połączyć obecny y z sąsiadami (dla ostrych zboczy)
+                    // No vertical gaps - need to connect current y with neighbors (for steep slopes)
                     const prevX_Y = Math.round(a * (Math.pow(x > -r ? x - 1 : x, 2) + z * z));
                     const prevZ_Y = Math.round(a * (x * x + Math.pow(z > -r ? z - 1 : z, 2)));
                     
                     let minConnectY = Math.min(topY, prevX_Y, prevZ_Y);
                     
                     if (!this.hollow) {
-                        // 4) Jeśli hollow = false: wypełnij bryłę od y=0 do y
+                        // 4) If hollow = false: fill shape from y=0 to y
                         for (let y = 0; y <= topY; y++) {
                             this.addBlock(x, y, z, this.materialWall);
                         }
                     } else {
-                        // Jeśli hollow = true: generuj tylko powłokę o grubości thickness
-                        // Upewnij się, że łata luki przy stromym nachyleniu
+                        // If hollow = true: generate only shell with thickness
+                        // Ensure gaps are patched on steep slopes
                         let bottomY = minConnectY - thick + 1;
                         if (bottomY > topY) bottomY = topY;
                         

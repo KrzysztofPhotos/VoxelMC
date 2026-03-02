@@ -1,71 +1,71 @@
 export const BlockRegistry = {
     stone: {
-        name: "Kamień (Stone)",
+        name: "Stone",
         textures: { all: "stone.png" }
     },
     cobblestone: {
-        name: "Bruk (Cobblestone)",
+        name: "Cobblestone",
         textures: { all: "cobblestone.png" }
     },
     dirt: {
-        name: "Ziemia (Dirt)",
+        name: "Dirt",
         textures: { all: "dirt.png" }
     },
     grass_block: {
-        name: "Blok trawy (Grass)",
+        name: "Grass Block",
         textures: {
             top: "grass_block_top.png",
             bottom: "dirt.png",
             side: "grass_block_side.png",
-            all: "grass_block_side.png" // Fallback fallback dla pojedynczego materiału
+            all: "grass_block_side.png"
         }
     },
     sand: {
-        name: "Piasek (Sand)",
+        name: "Sand",
         textures: { all: "sand.png" }
     },
     oak_planks: {
-        name: "Deski dębowe",
+        name: "Oak Planks",
         textures: { all: "oak_planks.png" }
     },
     spruce_planks: {
-        name: "Deski świerkowe",
+        name: "Spruce Planks",
         textures: { all: "spruce_planks.png" }
     },
     birch_planks: {
-        name: "Deski brzozowe",
+        name: "Birch Planks",
         textures: { all: "birch_planks.png" }
     },
     bricks: {
-        name: "Cegły (Bricks)",
+        name: "Bricks",
         textures: { all: "bricks.png" }
     },
     stone_bricks: {
-        name: "Kamienne cegły",
+        name: "Stone Bricks",
         textures: { all: "stone_bricks.png" }
     },
     deepslate: {
-        name: "Łupek (Deepslate)",
+        name: "Deepslate",
         textures: { all: "deepslate.png" }
     },
     polished_andesite: {
-        name: "Wypol. Andezyt",
+        name: "Polished Andesite",
         textures: { all: "polished_andesite.png" }
     },
     quartz_block: {
-        name: "Blok kwarcu",
+        name: "Quartz Block",
         textures: { all: "quartz_block.png" }
     },
     nether_bricks: {
-        name: "Cegły z Netheru",
+        name: "Nether Bricks",
         textures: { all: "nether_bricks.png" }
     },
     obsidian: {
-        name: "Obsydian",
+        name: "Obsidian",
         textures: { all: "obsidian.png" }
     },
     glass: {
-        name: "Szkło (Glass)",
+        name: "Glass",
         textures: { all: "glass.png" },
         transparent: true
     }
