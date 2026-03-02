@@ -118,16 +118,37 @@ export class Renderer2D {
         ctx.stroke();
 
         // Draw blocks for current layer
-        ctx.fillStyle = '#007acc';
+        const blocksInLayer = this.blocks.filter(b => b.y === this.currentY);
+        
+        // Basic color map for block types
+        const colorMap = {
+            'stone': '#888',
+            'cobblestone': '#777',
+            'stone_bricks': '#999',
+            'mossy_cobblestone': '#676',
+            'dirt': '#863',
+            'grass_block': '#5a3',
+            'sand': '#db5',
+            'oak_planks': '#a85',
+            'spruce_planks': '#642',
+            'birch_planks': '#dc9',
+            'bricks': '#a54',
+            'deepslate': '#333',
+            'polished_andesite': '#aaa',
+            'quartz_block': '#eee',
+            'glass': '#add8e6',
+            'water': '#36f',
+            'leaves': '#282'
+        };
+
         ctx.strokeStyle = '#fff';
         ctx.lineWidth = 1;
 
-        const blocksInLayer = this.blocks.filter(b => b.y === this.currentY);
-        
         for (const block of blocksInLayer) {
             const px = centerX + block.x * this.zoom - this.zoom / 2;
             const py = centerY + block.z * this.zoom - this.zoom / 2;
             
+            ctx.fillStyle = colorMap[block.type] || '#007acc';
             ctx.fillRect(px, py, this.zoom, this.zoom);
             ctx.strokeRect(px, py, this.zoom, this.zoom);
         }

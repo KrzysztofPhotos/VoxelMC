@@ -204,8 +204,17 @@ export class Renderer3D {
     setData(blocks, materialType = 'solid', textureType = 'stone') {
         if (this.mainMesh) {
             this.scene.remove(this.mainMesh);
-            this.mainMesh.geometry.dispose();
-            this.mainMesh.material.dispose();
+            // Recursively dispose geometries and materials
+            this.mainMesh.traverse(child => {
+                if (child.geometry) child.geometry.dispose();
+                if (child.material) {
+                    if (Array.isArray(child.material)) {
+                        child.material.forEach(m => m.dispose());
+                    } else {
+                        child.material.dispose();
+                    }
+                }
+            });
             this.mainMesh = null;
         }
         if (this.edgesMesh) {
@@ -217,90 +226,119 @@ export class Renderer3D {
         
         if (blocks.length === 0) return;
 
-        // Use standard BoxGeometry for perfect cubes
+        // Group blocks by type if using textures, otherwise treat as one monolithic shape
+        const blockGroups = {};
+        if (materialType === 'texture') {
+            blocks.forEach(b => {
+                const type = b.type || textureType;
+                if (!blockGroups[type]) blockGroups[type] = [];
+                blockGroups[type].push(b);
+            });
+        } else {
+            blockGroups['default'] = blocks;
+        }
+
         const baseGeometry = new THREE.BoxGeometry(1, 1, 1);
-        const geometries = [];
+        const groupMeshes = [];
         
+        for (const [type, groupBlocks] of Object.entries(blockGroups)) {
+            const geometries = [];
+            const matrix = new THREE.Matrix4();
+            
+            for (let i = 0; i < groupBlocks.length; i++) {
+                const b = groupBlocks[i];
+                matrix.makeTranslation(b.x, b.y, b.z);
+                const blockGeo = baseGeometry.clone();
+                blockGeo.applyMatrix4(matrix);
+                geometries.push(blockGeo);
+            }
+
+            let mergedGeometry = BufferGeometryUtils.mergeGeometries(geometries, true);
+            mergedGeometry.computeVertexNormals();
+
+            let material;
+            const baseColor = 0x007acc;
+
+            if (materialType === 'texture') {
+                material = this.getMaterialForBlock(type);
+            } else {
+                switch (materialType) {
+                    case 'glossy':
+                        material = new THREE.MeshStandardMaterial({ 
+                            color: baseColor,
+                            roughness: 0.1,
+                            metalness: 0.2,
+                            flatShading: false
+                        });
+                        break;
+                    case 'mirror':
+                        material = new THREE.MeshPhysicalMaterial({ 
+                            color: 0xffffff,
+                            metalness: 1.0,
+                            roughness: 0.05,
+                            envMapIntensity: 1.5,
+                            flatShading: false
+                        });
+                        break;
+                    case 'glass':
+                        material = new THREE.MeshPhysicalMaterial({ 
+                            color: 0xffffff,
+                            metalness: 0.1,
+                            roughness: 0.05,
+                            transmission: 0.95,
+                            ior: 1.5,
+                            thickness: 1.0,
+                            envMapIntensity: 1.2,
+                            transparent: true,
+                            flatShading: false
+                        });
+                        break;
+                    case 'wireframe':
+                        material = new THREE.MeshBasicMaterial({ 
+                            color: 0x007acc,
+                            wireframe: true,
+                            transparent: true,
+                            opacity: 0.3
+                        });
+                        break;
+                    case 'solid':
+                    default:
+                        material = new THREE.MeshStandardMaterial({ 
+                            color: baseColor,
+                            roughness: 0.7,
+                            metalness: 0.0,
+                            flatShading: false
+                        });
+                        break;
+                }
+            }
+
+            const mesh = new THREE.Mesh(mergedGeometry, material);
+            if (materialType !== 'wireframe') {
+                mesh.castShadow = true;
+                mesh.receiveShadow = true;
+            }
+            groupMeshes.push(mesh);
+        }
+
+        // Use a Group to hold all multi-material meshes
+        this.mainMesh = new THREE.Group();
+        groupMeshes.forEach(m => this.mainMesh.add(m));
+        this.scene.add(this.mainMesh);
+        
+        // Add outline edges for all meshes combined (optional, might be slow)
+        // For simplicity, we can just merge all geometries once for edges
+        const allGeometries = [];
         const matrix = new THREE.Matrix4();
-        
         for (let i = 0; i < blocks.length; i++) {
             const b = blocks[i];
             matrix.makeTranslation(b.x, b.y, b.z);
             const blockGeo = baseGeometry.clone();
             blockGeo.applyMatrix4(matrix);
-            geometries.push(blockGeo);
+            allGeometries.push(blockGeo);
         }
-
-        // Merge all block geometries into one single geometry for perfect continuous shading
-        // The `true` parameter preserves material indices (groups) from BoxGeometry
-        let mergedGeometry = BufferGeometryUtils.mergeGeometries(geometries, true);
-        mergedGeometry.computeVertexNormals();
-
-        let material;
-        const baseColor = 0x007acc;
-
-        switch (materialType) {
-            case 'texture':
-                material = this.getMaterialForBlock(textureType);
-                break;
-            case 'glossy':
-                material = new THREE.MeshStandardMaterial({ 
-                    color: baseColor,
-                    roughness: 0.1,
-                    metalness: 0.2,
-                    flatShading: false
-                });
-                break;
-            case 'mirror':
-                material = new THREE.MeshPhysicalMaterial({ 
-                    color: 0xffffff, // Bright silver
-                    metalness: 1.0,
-                    roughness: 0.05, // Almost perfect mirror
-                    envMapIntensity: 1.5,
-                    flatShading: false
-                });
-                break;
-            case 'glass':
-                material = new THREE.MeshPhysicalMaterial({ 
-                    color: 0xffffff,
-                    metalness: 0.1,
-                    roughness: 0.05,
-                    transmission: 0.95, // glass-like transparency
-                    ior: 1.5, // index of refraction
-                    thickness: 1.0,
-                    envMapIntensity: 1.2,
-                    transparent: true,
-                    flatShading: false
-                });
-                break;
-            case 'wireframe':
-                material = new THREE.MeshBasicMaterial({ 
-                    color: 0x007acc,
-                    wireframe: true,
-                    transparent: true,
-                    opacity: 0.3
-                });
-                break;
-            case 'solid':
-            default:
-                material = new THREE.MeshStandardMaterial({ 
-                    color: baseColor,
-                    roughness: 0.7,
-                    metalness: 0.0,
-                    flatShading: false
-                });
-                break;
-        }
-        
-        this.mainMesh = new THREE.Mesh(mergedGeometry, material);
-        
-        if (materialType !== 'wireframe') {
-            this.mainMesh.castShadow = true;
-            this.mainMesh.receiveShadow = true;
-        }
-        
-        // Add outline edges (slightly scaled to avoid z-fighting)
-        const edgeGeometry = new THREE.EdgesGeometry(mergedGeometry);
+        let mergedAllGeometry = BufferGeometryUtils.mergeGeometries(allGeometries, true);
+        const edgeGeometry = new THREE.EdgesGeometry(mergedAllGeometry);
         const edgesMat = new THREE.LineBasicMaterial({ 
             color: 0x000000, 
             linewidth: 1,
@@ -309,14 +347,10 @@ export class Renderer3D {
             depthTest: true,
             depthWrite: false
         });
-        
         this.edgesMesh = new THREE.LineSegments(edgeGeometry, edgesMat);
-        
         if (materialType === 'wireframe') {
             this.edgesMesh.visible = false;
         }
-        
-        this.scene.add(this.mainMesh);
         this.scene.add(this.edgesMesh);
     }
 

@@ -1,3 +1,3 @@
 import { UI } from './ui/UI.js';
 
-const app = new UI();
+window.app = new UI();

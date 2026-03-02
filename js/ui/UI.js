@@ -6,6 +6,7 @@ import { Cylinder } from '../shapes/Cylinder.js';
 import { Cone } from '../shapes/Cone.js';
 import { Torus } from '../shapes/Torus.js';
 import { ProceduralHouse } from '../shapes/ProceduralHouse.js';
+import { ProceduralMedievalHouse } from '../shapes/ProceduralMedievalHouse.js';
 import { ProceduralTower } from '../shapes/ProceduralTower.js';
 import { ProceduralArchBridge } from '../shapes/ProceduralArchBridge.js';
 import { ProceduralParaboloid } from '../shapes/ProceduralParaboloid.js';
@@ -82,6 +83,17 @@ export class UI {
                 { name: 'depth', label: 'Głębokość', value: 11 },
                 { name: 'height', label: 'Wysokość Ścian', value: 5 },
                 { name: 'roofHeight', label: 'Wysokość Dachu', value: 5 }
+            ]},
+            medieval_house: { class: ProceduralMedievalHouse, params: [
+                { name: 'width', label: 'Szerokość', value: 11 },
+                { name: 'depth', label: 'Głębokość', value: 11 },
+                { name: 'wallHeight', label: 'Wysokość Ścian', value: 6 },
+                { name: 'roofHeight', label: 'Wysokość Dachu', value: 5 },
+                { name: 'overhang', label: 'Wysunięcie Dachu', value: 1 },
+                { name: 'timberFrame', label: 'Drewniany Szkielet', value: true, type: 'checkbox' },
+                { name: 'chimney', label: 'Komin', value: true, type: 'checkbox' },
+                { name: 'foundationHeight', label: 'Wysokość Fundamentu', value: 1 },
+                { name: 'windowCount', label: 'Liczba Okien', value: 4 }
             ]},
             tower: { class: ProceduralTower, params: [
                 { name: 'radius', label: 'Promień', value: 8 },
