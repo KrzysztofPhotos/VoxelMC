@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VoxelGen - Plotz Clone</title>
+    <link rel="icon" type="image/svg+xml" href="favicon.svg">
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div id="app">
+        <aside id="sidebar">
+            <h1>VoxelGen</h1>
+            
+            <div class="control-group">
+                <label for="shape-select">Kształt</label>
+                <select id="shape-select">
+                    <option value="helix">Helisa</option>
+                    <option value="paraboloid">Paraboloida</option>
+                    <option value="bridge">Proceduralny Most</option>
+                    <option value="house">Proceduralny Dom</option>
+                    <option value="tower">Proceduralna Wieża</option>
+                    <option value="sphere">Kula</option>
+                    <option value="ellipsoid">Elipsoida</option>
+                    <option value="cylinder">Cylinder</option>
+                    <option value="cone">Stożek</option>
+                    <option value="torus">Torus</option>
+                    <option value="circle">Okrąg (2D)</option>
+                    <option value="ellipse">Elipsa (2D)</option>
+                </select>
+            </div>
+
+            <div id="dynamic-params">
+                <!-- Params will be injected here -->
+            </div>
+
+            <div class="control-group">
+                <label>
+                    <input type="checkbox" id="mode-shell"> Wydrążony (Hollow)
+                </label>
+            </div>
+            
+            <div class="control-group" id="wall-thickness-group" style="display: none;">
+                <label for="wall-thickness">Grubość ściany</label>
+                <input type="number" id="wall-thickness" value="1" min="1" step="1">
+            </div>
+
+            <div class="control-group">
+                <label for="material-select">Materiał 3D</label>
+                <select id="material-select">
+                    <option value="solid">Standardowy (Matowy)</option>
+                    <option value="texture">Tekstura (Minecraft)</option>
+                    <option value="glossy">Błyszczący (Plastik)</option>
+                    <option value="mirror">Lustro (Odbijający)</option>
+                    <option value="glass">Szkło (Przezroczysty)</option>
+                    <option value="wireframe">Siatka (Wireframe)</option>
+                </select>
+            </div>
+
+            <div class="control-group" id="block-type-group" style="display: none;">
+                <label for="block-type-select">Typ Bloku</label>
+                <select id="block-type-select">
+                    <!-- Options populated by JS -->
+                </select>
+            </div>
+
+            <div class="control-group">
+                <label for="background-select">Otoczenie 3D (Tło)</label>
+                <select id="background-select">
+                    <option value="studio">Studio (Ciemne)</option>
+                    <option value="minecraft">Minecraft (HDR)</option>
+                    <option value="ludwikowice">Ludwikowice (EXR)</option>
+                    <option value="bridge_exr">Most (EXR)</option>
+                </select>
+            </div>
+
+            <div class="control-group">
+                <label>
+                    <input type="checkbox" id="show-grid" checked> Pokaż siatkę
+                </label>
+            </div>
+
+            <button id="btn-generate" class="primary-btn">Generuj</button>
+
+            <div class="export-section">
+                <h3>Eksport</h3>
+                <button id="btn-export-json">JSON</button>
+                <button id="btn-export-csv">CSV</button>
+                <button id="btn-copy-clip">Kopiuj do schowka</button>
+            </div>
+        </aside>
+
+        <main id="workspace">
+            <header id="workspace-header">
+                <div class="view-toggles">
+                    <button id="btn-view-2d" class="active">Widok 2D</button>
+                    <button id="btn-view-3d">Podgląd 3D</button>
+                </div>
+                <div class="layer-controls" id="layer-controls">
+                    <label for="layer-slider">Warstwa Y: <span id="layer-display">0</span></label>
+                    <input type="range" id="layer-slider" min="0" max="0" value="0">
+                </div>
+                <div class="light-controls" id="light-controls" style="display: none;">
+                    <label for="light-slider">Światło: <span id="light-display">1.5</span></label>
+                    <input type="range" id="light-slider" min="0" max="3" step="0.1" value="1.5">
+                </div>
+            </header>
+
+            <div id="view-container">
+                <div id="view-2d" class="view-panel active">
+                    <canvas id="canvas-2d"></canvas>
+                    <div id="hover-info">X: 0, Z: 0</div>
+                </div>
+                <div id="view-3d" class="view-panel">
+                    <canvas id="canvas-3d"></canvas>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Scripts -->
+    <script type="importmap">
+        {
+            "imports": {
+                "three": "https://unpkg.com/three@0.160.0/build/three.module.js",
+                "three/addons/": "https://unpkg.com/three@0.160.0/examples/jsm/"
+            }
+        }
+    </script>
+    <script type="module" src="js/main.js"></script>
+</body>
+</html>
