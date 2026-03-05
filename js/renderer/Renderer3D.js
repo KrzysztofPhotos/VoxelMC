@@ -240,22 +240,9 @@ export class Renderer3D {
 
         const baseGeometry = new THREE.BoxGeometry(1, 1, 1);
         const groupMeshes = [];
+        const dummy = new THREE.Object3D();
         
         for (const [type, groupBlocks] of Object.entries(blockGroups)) {
-            const geometries = [];
-            const matrix = new THREE.Matrix4();
-            
-            for (let i = 0; i < groupBlocks.length; i++) {
-                const b = groupBlocks[i];
-                matrix.makeTranslation(b.x, b.y, b.z);
-                const blockGeo = baseGeometry.clone();
-                blockGeo.applyMatrix4(matrix);
-                geometries.push(blockGeo);
-            }
-
-            let mergedGeometry = BufferGeometryUtils.mergeGeometries(geometries, true);
-            mergedGeometry.computeVertexNormals();
-
             let material;
             const baseColor = 0x007acc;
 
@@ -313,12 +300,23 @@ export class Renderer3D {
                 }
             }
 
-            const mesh = new THREE.Mesh(mergedGeometry, material);
+            const count = groupBlocks.length;
+            const instancedMesh = new THREE.InstancedMesh(baseGeometry, material, count);
+            
             if (materialType !== 'wireframe') {
-                mesh.castShadow = true;
-                mesh.receiveShadow = true;
+                instancedMesh.castShadow = true;
+                instancedMesh.receiveShadow = true;
             }
-            groupMeshes.push(mesh);
+
+            for (let i = 0; i < count; i++) {
+                const b = groupBlocks[i];
+                dummy.position.set(b.x, b.y, b.z);
+                dummy.updateMatrix();
+                instancedMesh.setMatrixAt(i, dummy.matrix);
+            }
+            
+            instancedMesh.instanceMatrix.needsUpdate = true;
+            groupMeshes.push(instancedMesh);
         }
 
         // Use a Group to hold all multi-material meshes
@@ -326,32 +324,32 @@ export class Renderer3D {
         groupMeshes.forEach(m => this.mainMesh.add(m));
         this.scene.add(this.mainMesh);
         
-        // Add outline edges for all meshes combined (optional, might be slow)
-        // For simplicity, we can just merge all geometries once for edges
-        const allGeometries = [];
-        const matrix = new THREE.Matrix4();
-        for (let i = 0; i < blocks.length; i++) {
-            const b = blocks[i];
-            matrix.makeTranslation(b.x, b.y, b.z);
-            const blockGeo = baseGeometry.clone();
-            blockGeo.applyMatrix4(matrix);
-            allGeometries.push(blockGeo);
+        // Add outline edges for smaller meshes. Skip for large meshes to maintain performance.
+        if (blocks.length <= 2000 && materialType !== 'wireframe') {
+            const allGeometries = [];
+            const matrix = new THREE.Matrix4();
+            for (let i = 0; i < blocks.length; i++) {
+                const b = blocks[i];
+                matrix.makeTranslation(b.x, b.y, b.z);
+                const blockGeo = baseGeometry.clone();
+                blockGeo.applyMatrix4(matrix);
+                allGeometries.push(blockGeo);
+            }
+            let mergedAllGeometry = BufferGeometryUtils.mergeGeometries(allGeometries, true);
+            const edgeGeometry = new THREE.EdgesGeometry(mergedAllGeometry);
+            const edgesMat = new THREE.LineBasicMaterial({ 
+                color: 0x000000, 
+                linewidth: 1,
+                opacity: 0.25,
+                transparent: true,
+                depthTest: true,
+                depthWrite: false
+            });
+            this.edgesMesh = new THREE.LineSegments(edgeGeometry, edgesMat);
+            this.scene.add(this.edgesMesh);
+        } else if (blocks.length > 2000) {
+            console.warn(`Skipping outline generation for ${blocks.length} blocks to maintain performance.`);
         }
-        let mergedAllGeometry = BufferGeometryUtils.mergeGeometries(allGeometries, true);
-        const edgeGeometry = new THREE.EdgesGeometry(mergedAllGeometry);
-        const edgesMat = new THREE.LineBasicMaterial({ 
-            color: 0x000000, 
-            linewidth: 1,
-            opacity: 0.25,
-            transparent: true,
-            depthTest: true,
-            depthWrite: false
-        });
-        this.edgesMesh = new THREE.LineSegments(edgeGeometry, edgesMat);
-        if (materialType === 'wireframe') {
-            this.edgesMesh.visible = false;
-        }
-        this.scene.add(this.edgesMesh);
     }
 
     setLightIntensity(intensity) {
