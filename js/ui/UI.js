@@ -321,7 +321,7 @@ export class UI {
         this.updateLayerControls(shapeType);
         
         const currentY = parseInt(this.layerSlider.value) || 0;
-        this.renderer2D.draw(this.currentBlocks);
+        this.renderer2D.setData(this.currentBlocks, currentY);
 
         if (this.renderer3D) {
             const materialType = this.materialSelect ? this.materialSelect.value : 'solid';
