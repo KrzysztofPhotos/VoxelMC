@@ -12,18 +12,15 @@ export class ProceduralSpiralStairs extends Shape {
         this.centralColumn = params.centralColumn !== undefined ? params.centralColumn : true;
     }
 
+    // Since this is a procedural generator overriding generate, we need to populate this.space directly.
     generate() {
-        const blocks = [];
-        const added = new Set();
-
-        const addBlock = (x, y, z, type = 'stone') => {
+        const customAddBlock = (x, y, z, type = 'stone') => {
             const ix = Math.round(x);
             const iy = Math.round(y);
             const iz = Math.round(z);
             const key = `${ix},${iy},${iz}`;
-            if (!added.has(key)) {
-                added.add(key);
-                blocks.push({ x: ix, y: iy, z: iz, type });
+            if (!this.space.voxels.has(key)) {
+                this.space.voxels.set(key, { x: ix, y: iy, z: iz, type });
             }
         };
 
@@ -34,7 +31,7 @@ export class ProceduralSpiralStairs extends Shape {
                 for (let x = -this.innerRadius; x <= this.innerRadius; x++) {
                     for (let z = -this.innerRadius; z <= this.innerRadius; z++) {
                         if (x * x + z * z <= this.innerRadius * this.innerRadius) {
-                            addBlock(x, y, z, colType);
+                            customAddBlock(x, y, z, colType);
                         }
                     }
                 }
@@ -74,13 +71,11 @@ export class ProceduralSpiralStairs extends Shape {
                     // Also step y is bounded by total height
                     for(let dy = 0; dy < this.stepHeight; dy++) {
                        if (y - dy >= 0 && y - dy <= this.height) {
-                           addBlock(x, y - dy, z, 'oak_planks');
+                           customAddBlock(x, y - dy, z, 'oak_planks');
                        }
                     }
                 }
             }
         }
-
-        return blocks;
     }
 }
